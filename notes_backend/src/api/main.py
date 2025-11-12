@@ -43,5 +43,17 @@ def health_check():
     return {"message": "Healthy"}
 
 
+# PUBLIC_INTERFACE
+@app.get("/health", tags=["Health"], summary="Health Check (alias)")
+def health_check_alias():
+    """
+    Health check alias endpoint for readiness/liveness probes.
+
+    Returns:
+    - dict: A simple object containing a 'message' key with 'Healthy' value.
+    """
+    return {"message": "Healthy"}
+
+
 # Register routes
 app.include_router(notes_router)
