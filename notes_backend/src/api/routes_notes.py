@@ -4,7 +4,6 @@ from datetime import datetime, timezone
 from typing import Dict, List
 
 from fastapi import APIRouter, HTTPException, status
-from pydantic import Field
 
 from .models import Note, NoteCreate, NoteUpdate
 
@@ -89,7 +88,7 @@ def list_notes() -> List[Note]:
     summary="Get a note",
     description="Retrieve a single note by its id.",
 )
-def get_note(note_id: int = Field(..., description="ID of the note to retrieve")) -> Note:
+def get_note(note_id: int) -> Note:
     """
     Retrieve a single note by ID.
 
@@ -116,7 +115,7 @@ def get_note(note_id: int = Field(..., description="ID of the note to retrieve")
     description="Replace a note's title and content entirely.",
 )
 def replace_note(
-    note_id: int = Field(..., description="ID of the note to replace"),
+    note_id: int,
     payload: NoteCreate = ...,
 ) -> Note:
     """
@@ -156,7 +155,7 @@ def replace_note(
     description="Partially update a note's title and/or content.",
 )
 def update_note(
-    note_id: int = Field(..., description="ID of the note to update"),
+    note_id: int,
     payload: NoteUpdate = ...,
 ) -> Note:
     """
@@ -198,7 +197,7 @@ def update_note(
     description="Delete a note by id.",
     responses={204: {"description": "Note deleted"}},
 )
-def delete_note(note_id: int = Field(..., description="ID of the note to delete")) -> None:
+def delete_note(note_id: int) -> None:
     """
     Delete a note by ID.
 
