@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import Dict, List
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Response
 
 from .models import Note, NoteCreate, NoteUpdate
 
@@ -197,7 +197,7 @@ def update_note(
     description="Delete a note by id.",
     responses={204: {"description": "Note deleted"}},
 )
-def delete_note(note_id: int) -> None:
+def delete_note(note_id: int) -> Response:
     """
     Delete a note by ID.
 
@@ -205,7 +205,7 @@ def delete_note(note_id: int) -> None:
     - note_id: int - The id of the note to delete
 
     Returns:
-    - None (204 No Content on success)
+    - Response: 204 No Content on success (no response body)
 
     Raises:
     - HTTPException 404 if the note is not found.
@@ -213,4 +213,5 @@ def delete_note(note_id: int) -> None:
     if note_id not in _STORE:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Note not found")
     del _STORE[note_id]
-    return None
+    # For 204 status, FastAPI must not send a body
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
