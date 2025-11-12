@@ -1,5 +1,7 @@
+import os
 from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
 
 from .routes_notes import router as notes_router
 
@@ -15,6 +17,9 @@ openapi_tags = [
     },
 ]
 
+# Respect reverse proxy base path if provided by environment (e.g., ingress/preview platforms)
+ROOT_PATH = os.getenv("ROOT_PATH", "")
+
 # Create FastAPI application with explicit metadata
 app = FastAPI(
     title="Simple Notes API",
@@ -27,6 +32,7 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc",
     openapi_url="/openapi.json",
+    root_path=ROOT_PATH,  # ensure correct URL generation behind a proxy
 )
 
 # Allow all origins for preview/testing purposes (suitable for ephemeral preview envs)
@@ -77,6 +83,15 @@ def docs_head() -> Response:
     """
     # Avoid heavy rendering; just return 200 OK with no body
     return Response(status_code=200)
+
+
+# PUBLIC_INTERFACE
+@app.get("/index", include_in_schema=False, summary="Index to docs", description="Redirects to interactive API docs.")
+def index_redirect():
+    """
+    Redirects clients from /index to /docs. Some load balancers probe a generic index path.
+    """
+    return RedirectResponse(url="/docs", status_code=302)
 
 
 # Register routes
